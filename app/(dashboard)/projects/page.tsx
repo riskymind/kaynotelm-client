@@ -11,7 +11,7 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 import toast from "react-hot-toast";
 import { apiClient } from "@/lib/api";
-import { Project } from "@/lib/types";
+import { Project } from "@/lib/types/types";
 
 function ProjectsPage() {
   // * Data States - What data we're tracking

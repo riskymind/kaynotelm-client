@@ -1,5 +1,14 @@
-import { MessageSquare, Plus, AlertCircle, Trash2 } from "lucide-react";
-import { Project, Chat } from "@/lib/types";
+import { useState } from "react";
+import {
+  MessageSquare,
+  Plus,
+  AlertCircle,
+  Trash2,
+  Pencil,
+  Check,
+  X,
+} from "lucide-react";
+import { Project, Chat } from "@/lib/types/types";
 
 interface ConversationsListProps {
   project: Project;
@@ -9,6 +18,7 @@ interface ConversationsListProps {
   onCreateNewChat: () => void;
   onChatClick: (chatId: string) => void;
   onDeleteChat: (chatId: string) => void;
+  onUpdateChat: (chatId: string, title: string) => Promise<boolean>;
 }
 
 export function ConversationsList({
@@ -19,8 +29,43 @@ export function ConversationsList({
   onCreateNewChat,
   onChatClick,
   onDeleteChat,
+  onUpdateChat,
 }: ConversationsListProps) {
   const hasConversations = conversations.length > 0;
+
+  const [editingChatId, setEditingChatId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+
+  const startEditing = (chat: Chat) => {
+    setEditingChatId(chat.id);
+    setEditTitle(chat.title);
+  };
+
+  const cancelEditing = () => {
+    setEditingChatId(null);
+    setEditTitle("");
+  };
+
+  const saveEditing = async (chat: Chat) => {
+    if (isSaving) return;
+
+    const trimmedTitle = editTitle.trim();
+
+    // Nothing to save if the title is empty or unchanged
+    if (!trimmedTitle || trimmedTitle === chat.title) {
+      cancelEditing();
+      return;
+    }
+
+    setIsSaving(true);
+    const success = await onUpdateChat(chat.id, trimmedTitle);
+    setIsSaving(false);
+
+    if (success) {
+      cancelEditing();
+    }
+  };
 
   return (
     <div className="flex-1 flex flex-col bg-[#1a1a1a] rounded-xl overflow-hidden">
@@ -112,11 +157,16 @@ export function ConversationsList({
               </div>
             ) : (
               <div className="space-y-2">
-                {conversations.map((chat) => (
+                {conversations.map((chat) => {
+                  const isEditing = editingChatId === chat.id;
+
+                  return (
                   <div
                     key={chat.id}
-                    onClick={() => onChatClick(chat.id)}
-                    className="group bg-[#202020] hover:bg-[#252525] border border-gray-800 hover:border-gray-700 rounded-lg p-4 transition-colors cursor-pointer"
+                    onClick={() => !isEditing && onChatClick(chat.id)}
+                    className={`group bg-[#202020] hover:bg-[#252525] border border-gray-800 hover:border-gray-700 rounded-lg p-4 transition-colors ${
+                      isEditing ? "" : "cursor-pointer"
+                    }`}
                   >
                     <div className="flex items-center gap-4">
                       {/* Chat Icon */}
@@ -129,25 +179,86 @@ export function ConversationsList({
 
                       {/* Chat Info */}
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-medium text-gray-200 group-hover:text-white truncate transition-colors">
-                          {chat.title}
-                        </h3>
+                        {isEditing ? (
+                          <input
+                            autoFocus
+                            value={editTitle}
+                            disabled={isSaving}
+                            onChange={(e) => setEditTitle(e.target.value)}
+                            onClick={(e) => e.stopPropagation()}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") saveEditing(chat);
+                              if (e.key === "Escape") cancelEditing();
+                            }}
+                            onBlur={() => saveEditing(chat)}
+                            maxLength={100}
+                            className="w-full bg-[#1a1a1a] border border-gray-700 focus:border-gray-500 rounded px-2 py-1 text-gray-100 font-medium outline-none disabled:opacity-60"
+                          />
+                        ) : (
+                          <h3 className="font-medium text-gray-200 group-hover:text-white truncate transition-colors">
+                            {chat.title}
+                          </h3>
+                        )}
                       </div>
 
-                      {/* Delete Button */}
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onDeleteChat(chat.id);
-                        }}
-                        className="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded transition-all duration-200 opacity-0 group-hover:opacity-100 cursor-pointer hover:scale-110"
-                        title="Delete chat"
-                      >
-                        <Trash2 size={12} />
-                      </button>
+                      {isEditing ? (
+                        /* Save / Cancel Buttons */
+                        <div className="flex items-center gap-1">
+                          <button
+                            // Prevent input blur from firing before the click
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              saveEditing(chat);
+                            }}
+                            disabled={isSaving}
+                            className="p-1.5 text-gray-500 hover:text-green-400 hover:bg-green-500/10 rounded transition-all duration-200 cursor-pointer disabled:opacity-50"
+                            title="Save"
+                          >
+                            <Check size={12} />
+                          </button>
+                          <button
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              cancelEditing();
+                            }}
+                            disabled={isSaving}
+                            className="p-1.5 text-gray-500 hover:text-gray-300 hover:bg-gray-500/10 rounded transition-all duration-200 cursor-pointer disabled:opacity-50"
+                            title="Cancel"
+                          >
+                            <X size={12} />
+                          </button>
+                        </div>
+                      ) : (
+                        /* Edit / Delete Buttons */
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              startEditing(chat);
+                            }}
+                            className="p-1.5 text-gray-500 hover:text-blue-400 hover:bg-blue-500/10 rounded transition-all duration-200 cursor-pointer hover:scale-110"
+                            title="Rename chat"
+                          >
+                            <Pencil size={12} />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onDeleteChat(chat.id);
+                            }}
+                            className="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded transition-all duration-200 cursor-pointer hover:scale-110"
+                            title="Delete chat"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </section>

@@ -9,7 +9,7 @@ import {
   Trash2,
   Pencil,
 } from "lucide-react";
-import { Project } from "@/lib/types";
+import { Project } from "@/lib/types/types";
 
 interface ProjectsGridProps {
   projects: Project[];

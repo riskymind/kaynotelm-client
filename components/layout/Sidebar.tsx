@@ -2,14 +2,43 @@
 
 import { UserButton } from "@clerk/nextjs";
 import { Plus, Briefcase, PanelLeftClose, PanelLeftOpen } from "lucide-react";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
+
+function ProjectsNavButton({
+  isActive,
+  onClick,
+}: {
+  isActive: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`w-full flex items-center gap-3 p-2 text-sm rounded-md transition-colors ${
+        isActive
+          ? "bg-[#252525] text-gray-200 border border-gray-700"
+          : "text-gray-400 hover:bg-[#252525] hover:text-gray-200"
+      }`}
+    >
+      <Briefcase size={16} />
+      <span>Projects</span>
+    </button>
+  );
+}
+
+// usePathname must be read inside Suspense so the layout can still prerender
+function ActiveProjectsNavButton({ onClick }: { onClick: () => void }) {
+  const pathname = usePathname();
+  return (
+    <ProjectsNavButton isActive={pathname === "/projects"} onClick={onClick} />
+  );
+}
 
 export function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const router = useRouter();
-  const pathname = usePathname();
 
   const handleProjectsClick = () => {
     router.push("/projects");
@@ -59,17 +88,13 @@ export function Sidebar() {
       {!isCollapsed && (
         <div className="px-3 pb-3">
           <nav className="space-y-1">
-            <button
-              onClick={handleProjectsClick}
-              className={`w-full flex items-center gap-3 p-2 text-sm rounded-md transition-colors ${
-                pathname === "/projects"
-                  ? "bg-[#252525] text-gray-200 border border-gray-700"
-                  : "text-gray-400 hover:bg-[#252525] hover:text-gray-200"
-              }`}
+            <Suspense
+              fallback={
+                <ProjectsNavButton isActive={false} onClick={handleProjectsClick} />
+              }
             >
-              <Briefcase size={16} />
-              <span>Projects</span>
-            </button>
+              <ActiveProjectsNavButton onClick={handleProjectsClick} />
+            </Suspense>
           </nav>
         </div>
       )}

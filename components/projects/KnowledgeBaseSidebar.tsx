@@ -15,7 +15,7 @@ import {
   Trash2,
   Info,
 } from "lucide-react";
-import { ProjectSettings, ProjectDocument } from "@/lib/types";
+import { ProjectSettings, ProjectDocument } from "@/lib/types/types";
 import { JSX, useState } from "react";
 
 // Constants
@@ -47,7 +47,7 @@ const RERANKING_MODELS = [
 ];
 
 const EMBEDDING_MODELS = [
-  { value: "text-embedding-3-large", label: "text-embedding-3-large" },
+  { value: "text-embedding-3-small", label: "text-embedding-3-small" },
 ];
 
 const AGENT_MODE_OPTIONS = [
