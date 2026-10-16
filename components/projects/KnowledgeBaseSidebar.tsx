@@ -201,9 +201,9 @@ const StatusAlert = ({
   >
     <div className="flex items-center gap-3">
       {type === "error" ? (
-        <Info size={14} className="text-red-400 flex-shrink-0" />
+        <Info size={14} className="text-red-400 shrink-0" />
       ) : (
-        <div className="w-3 h-3 border border-blue-400 border-t-transparent rounded-full animate-spin flex-shrink-0"></div>
+        <div className="w-3 h-3 border border-blue-400 border-t-transparent rounded-full animate-spin shrink-0"></div>
       )}
       <span
         className={`text-sm ${
@@ -495,7 +495,7 @@ export function KnowledgeBaseSidebar({
                         className="group bg-[#202020] hover:bg-[#252525] border border-gray-800 hover:border-gray-700 rounded-lg p-3 transition-colors cursor-pointer"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="flex-shrink-0 w-7 h-7 bg-[#252525] border border-gray-700 rounded-md flex items-center justify-center">
+                          <div className="shrink-0 w-7 h-7 bg-[#252525] border border-gray-700 rounded-md flex items-center justify-center">
                             {documentUtils.getIcon(doc)}
                           </div>
                           <div className="flex-1 min-w-0">
