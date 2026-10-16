@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { apiClient } from "@/lib/api";
-import { ProjectDocument } from "@/lib/types/types";
+import { ProjectDocument } from "@/lib/types";
 import { GenericStep } from "./document-details/GenericStep";
 import { PartitioningStep } from "./document-details/PartitioningStep";
 import { ChunkingStep } from "./document-details/ChunkingStep";

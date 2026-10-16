@@ -8,7 +8,7 @@ import {
   Check,
   X,
 } from "lucide-react";
-import { Project, Chat } from "@/lib/types/types";
+import { Project, Chat } from "@/lib/types";
 
 interface ConversationsListProps {
   project: Project;

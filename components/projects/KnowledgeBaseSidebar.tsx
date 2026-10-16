@@ -15,7 +15,7 @@ import {
   Trash2,
   Info,
 } from "lucide-react";
-import { ProjectSettings, ProjectDocument } from "@/lib/types/types";
+import { ProjectSettings, ProjectDocument } from "@/lib/types";
 import { JSX, useState } from "react";
 
 // Constants

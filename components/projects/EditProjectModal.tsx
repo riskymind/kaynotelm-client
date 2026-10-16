@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { X, Pencil } from "lucide-react";
-import { Project } from "@/lib/types/types";
+import { Project } from "@/lib/types";
 
 interface EditProjectModalProps {
   project: Project | null;
